@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Grit-Mindfulness Scale</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      max-width: 800px;
+      margin: auto;
+    }
+    h1 {
+      text-align: center;
+    }
+    .question {
+      margin-bottom: 20px;
+    }
+    label {
+      display: block;
+      margin-bottom: 8px;
+    }
+    select {
+      width: 100%;
+      padding: 8px;
+    }
+    button {
+      display: block;
+      margin: 30px auto;
+      padding: 10px 20px;
+      font-size: 16px;
+    }
+    #result {
+      margin-top: 30px;
+      font-size: 18px;
+      text-align: center;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Grit-Mindfulness Scale</h1>
+  <form id="gritForm">
+    <div id="questions"></div>
+    <button type="button" onclick="calculateScore()">Submit</button>
+  </form>
+
+  <div id="result"></div>
+
+  <script>
+    const statements = [
+      "I prefer to be systematic and organized in my approach to tasks and responsibilities.",
+      "I work on my tasks even before the submission deadline.",
+      "I view challenges as opportunities to grow rather than obstacles to avoid.",
+      "I have many ideas and plans that I want to pursue, but I find it challenging to take the necessary steps to bring them to life.", // Reverse
+      "I work on decisions through careful discernment, not out of impulsiveness.",
+      "I can stay calm and composed even when a task becomes overwhelming.",
+      "I commit to goals that align with my values, and I stick to them consistently.",
+      "I dwell on past mistakes and failures that negatively impact my current performance and decision-making.", // Reverse
+      "I bounce back quickly after setbacks, using them as learning experiences.",
+      "I often feel frustrated when tasks don't produce immediate results, as I tend to expect quick outcomes from my efforts, which then affects my patience and persistence to finish the work.", // Reverse
+      "I adapt my strategies when faced with unexpected challenges instead of quitting.",
+      "I finish what I start, even if the process takes longer than expected.",
+      "I stay attentive to the quality of my work throughout the entire process.",
+      "I often leave tasks unfinished when I feel bored or disinterested.", // Reverse
+      "I constantly shift focus between tasks, which prevents me from completing any of them effectively." // Reverse
+    ];
+
+    // 0-based indices for reverse-scored items
+    const reverseItems = [3, 7, 9, 13, 14];
+
+    const questionsDiv = document.getElementById("questions");
+
+    statements.forEach((statement, index) => {
+      const questionDiv = document.createElement("div");
+      questionDiv.className = "question";
+      questionDiv.innerHTML = `
+        <label>${index + 1}. ${statement}</label>
+        <select name="q${index}">
+          <option value="5">5 - Very much like me</option>
+          <option value="4">4 - Most likely like me</option>
+          <option value="3">3 - Somewhat like me</option>
+          <option value="2">2 - Not much like me</option>
+          <option value="1">1 - Not like me at all</option>
+        </select>
+      `;
+      questionsDiv.appendChild(questionDiv);
+    });
+
+    function reverseScore(value) {
+      return 6 - value;
+    }
+
+    function calculateScore() {
+      const form = document.getElementById("gritForm");
+      const formData = new FormData(form);
+      let total = 0;
+
+      for (let i = 0; i < statements.length; i++) {
+        let raw = parseInt(formData.get(`q${i}`));
+        let score = reverseItems.includes(i) ? reverseScore(raw) : raw;
+        total += score;
+      }
+
+      const avg = (total / statements.length).toFixed(2);
+      let interpretation = "";
+
+      if (avg >= 4.0) {
+        interpretation = "High Grit-Mindfulness";
+      } else if (avg >= 3.5) {
+        interpretation = "Medium Grit-Mindfulness";
+      } else {
+        interpretation = "Low Grit-Mindfulness";
+      }
+
+      document.getElementById("result").innerHTML = `
+        Your Grit-Mindfulness Score: <strong>${avg}</strong><br><br>
+        <strong>Interpretation:</strong> ${interpretation}
+      `;
+    }
+  </script>
+
+</body>
+</html>
